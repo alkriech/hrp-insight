@@ -1,0 +1,11 @@
+# Catatan validasi HAFECS Insight
+
+Pengujian dilakukan terhadap kode backend yang sama dengan route produksi, menggunakan adapter SQLite in-memory dengan foreign key aktif dan transaksi untuk emulasi D1 batch. Object storage menggunakan adapter sementara. Seluruh isi pengujian bersifat sintetis dan tidak pernah dimasukkan ke database produksi.
+
+21 skenario integrasi telah lulus: bootstrap privat dan username login; atribut cookie; pembatasan cross-origin dan custom header; persistensi seluruh informasi kegiatan serta validasi durasi; form kosong tanpa identitas otomatis; pertanyaan pairing pilihan sendiri; tidak adanya kunci jawaban pada API peserta; validasi opsi, required, dan consent; enkripsi, scoring server, dan idempotensi; unique constraint anti-duplikasi kode; struktur terkunci setelah respons pertama; duplikat versi; regresi section yang mempertahankan pertanyaan awal; denominator analisis pasangan yang benar; semantik radio, checkbox, dan Lainnya; scope staf/analis dan pencabutan sesi; pengecualian data tanpa mengubah jawaban asli; akses media serta penolakan tipe berbahaya; rotasi/penutupan tautan; autentikasi ulang; netralisasi formula CSV dan konteks enkripsi; vektor TOTP; retensi/purge; serta rate limiting login. Beberapa skenario memuat lebih dari satu assertion.
+
+Pemeriksaan ini memverifikasi aturan aplikasi dan SQL, bukan perilaku browser, jaringan produksi, kapasitas D1/R2, kondisi deployment, atau ketahanan terhadap seluruh kelas serangan. Pemeriksaan tipe dan build dilakukan terpisah. Tidak ada klaim audit keamanan atau sertifikasi kepatuhan.
+
+## Perbaikan localhost Windows
+
+Setup melalui Node.js menambahkan migrasi lokal terjurnal, pembuatan admin melalui terminal, kunci enkripsi lokal, dan launcher localhost dengan port tetap. Pengujian `npm run test:local` lulus menggunakan getPlatformProxy dengan D1/R2 lokal nyata: migrasi pertama dan ulang, penolakan admin kedua, session 200, login dengan sandi hasil setup, kewajiban ganti sandi, serta persistensi DB dan media setelah proxy dibuka ulang. Seluruh 21 pengujian keamanan dan TypeScript tetap lulus; build juga lulus. Pengujian dijalankan pada Linux; Windows native dan interaksi browser belum diuji. Tidak ada perubahan pada API bootstrap produksi atau akses situs yang dipublikasikan.

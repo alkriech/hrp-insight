@@ -1,0 +1,1 @@
+ALTER TABLE `trainings` ADD COLUMN `banner` text;--> statement-breakpoint

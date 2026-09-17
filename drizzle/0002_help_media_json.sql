@@ -1,0 +1,2 @@
+ALTER TABLE `help` ADD COLUMN `media_json` text;--> statement-breakpoint
+UPDATE `help` SET `media_json` = json_array(json_object('key', COALESCE(`media_key`, ''), 'mime', COALESCE(`media_mime`, ''), 'size', COALESCE(`media_size`, 0))) WHERE `media_key` IS NOT NULL;
