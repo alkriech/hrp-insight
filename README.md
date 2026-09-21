@@ -1,65 +1,28 @@
 # HRP Insight
 
-Untuk menjalankan ZIP di Windows, ikuti [MULAI-WINDOWS.md](MULAI-WINDOWS.md): jalankan `npm run setup:local` setelah instalasi dependency, lalu `npm run dev`. Admin lokal dibuat melalui terminal, dan database lokal terpisah dari situs online.
+HRP Insight adalah aplikasi pengelolaan pelatihan, survei, asesmen, dan evaluasi untuk Research & Publication. Satu tempat untuk kegiatan, formulir, respons, dan laporan — dari pengajuan sampai evaluasi.
 
-Aplikasi full stack untuk pengelolaan kegiatan pelatihan, formulir, respons, asesmen, dan laporan Research & Publication. Implementasi mengikuti proyek ZIP serta daftar revisi pengguna. Data kegiatan dan respons hanya dapat dimasukkan oleh pengguna aplikasi; data contoh untuk demo lokal dibuat melalui `npm run seed:dummy` dan tidak pernah masuk ke database produksi.
+## Bagi pengunjung
 
-## Mulai menggunakan
+- Formulir Layanan di halaman depan bisa diisi tanpa akun: **Pengajuan kegiatan** (bagi atasan) dan **Saran & masukan** (bagi peserta).
+- Sebagai peserta pelatihan, Anda menerima tautan bersama untuk mengisi pretest, posttest, atau evaluasi kegiatan. Tidak perlu akun aplikasi.
+- Pengisian tidak mewajibkan identitas. Jika kegiatan memakai kode peserta, gunakan kode yang sama di setiap formulir agar hasilnya bisa dipasangkan.
+- Kiriman Anda terenkripsi; identitas hanya diakses petugas berwenang dan masa simpannya diatur pengelola.
 
-Buka situs privat dan buat administrator pertama menggunakan nama, username, dan sandi minimal 14 karakter. Tidak ada email pada pembuatan akun maupun login aplikasi. Setelah masuk, tambahkan kegiatan melalui Rekap Kegiatan, lalu buat formulir dari awal atau dari koleksi template. Administrator membuat akun staf melalui Anggota Tim dan menentukan kegiatan yang dapat mereka akses. Akun staf baru wajib mengganti sandi sementara.
+## Bagi tim HRP
 
-Kolom rekap mencakup program, status, tanggal, waktu, zona waktu, durasi dalam menit, kategori, jenjang, penyelenggara, metode, lokasi, skema, harga, target peserta, perkiraan pendapatan, tim pelaksana, serta tautan pendaftaran, grup, pertemuan, materi, dan dokumentasi. Unduhan CSV mengikuti hasil pencarian dan filter. Kolom lengkap dapat ditampilkan dari halaman rekap.
+- Buka situs lalu masuk dengan akun pengelola untuk membuka **workspace**.
+- **Rekap kegiatan** — catat informasi pelatihan, survei, dan asesmen.
+- **Formulir & respons** — susun instrumen, bagikan tautan, tinjau, dan ekspor hasil.
+- **Laporan evaluasi** — analisis distribusi jawaban dan perubahan skor, siap dicetak/diunduh.
+- Akses dibagi per peran (admin, staf, analis); akun dibuat dan dikelola admin.
 
-Form builder menyediakan pertanyaan teks, paragraf, angka, pilihan ganda berbentuk radio, checkbox, Likert, dan Ya/Tidak. Pertanyaan baru wajib diisi secara default. Opsi Lainnya menyediakan isian dan dibatasi satu per pertanyaan. Toolbar format menggunakan ikon, menampilkan status aktif, serta mendukung tebal, miring, garis bawah, tautan dengan teks tampilan, dan hapus format. Foto PNG/JPG/WebP dan video MP4/WebM disimpan secara privat; ukuran maksimal 20 MB. Media ditampilkan segera setelah unggahan selesai dan harus disimpan bersama perubahan formulir.
+## Privasi
 
-Tambahkan Judul membuat judul/deskripsi pada halaman yang sama. Tambahkan Bagian memulai halaman berikutnya, dimulai dari Bagian 2. Pertanyaan yang berada sebelum pembatas pertama tetap ada di Bagian 1. Tombol tambah tetap terjangkau di bagian bawah viewport. Urutan dapat diubah melalui drag handle maupun tombol naik/turun. Identitas responden tidak ditambahkan otomatis. Tambahkan sendiri pertanyaan nama, sekolah, atau kode peserta jika memang dibutuhkan.
+- Jawaban disimpan terenkripsi di server; kunci jawaban/bobot tidak pernah dikirim ke peserta.
+- Masa simpan respons diatur pengelola (default 365 hari).
+- Untuk pertanyaan terkait data: `hrpinstrumen@gmail.com`.
 
-Formulir menggunakan satu tautan bersama yang dapat dipakai berulang. Token acak berada dalam fragmen URL, lalu dikirim ke API melalui header Authorization. Tautan dapat dicabut dan diganti, pengisian dapat ditutup atau diberi batas tanggal. Halaman peserta tidak membutuhkan akun aplikasi. Namun publikasi saat penyerahan ini masih dibatasi untuk pemilik situs oleh lapisan akses platform. Tim dan peserta eksternal belum dapat melewati lapisan tersebut. Siapkan akses situs atau domain perusahaan yang sesuai sebelum mendistribusikan tautan.
+## Bantuan
 
-Untuk pairing, tambahkan pertanyaan kode peserta pada kedua asesmen, jadikan wajib diisi, lalu pilih pertanyaan tersebut di Pengaturan Formulir. Isi kode harus konsisten di kedua formulir. Tidak ada pairing berdasarkan nama secara otomatis. Kode ini tidak membuktikan identitas seseorang. Tanpa pertanyaan pairing, respons tetap diterima tetapi tidak dipasangkan. Kunci jawaban dan bobot perlu diisi pada pertanyaan yang memang dinilai; template asesmen bawaan hanya kerangka dan tidak berisi kunci pengetahuan fiktif.
-
-Setelah respons pertama, struktur, kunci jawaban, dan konfigurasi pairing terkunci. Perubahan substantif dibuat melalui duplikat sebagai versi baru. Menghapus seluruh respons tidak membuka kunci struktur lama. Respons dapat ditinjau satu per satu, dikecualikan dari analisis dengan alasan, dipulihkan ke analisis, diekspor ke CSV, atau dihapus oleh administrator. Laporan menampilkan distribusi pilihan, mean untuk skala/angka, respons valid, jumlah pasangan, dan perubahan skor pada pasangan pretest-posttest yang sama. Skor dinormalisasi ke 0–100. Cetak / Simpan PDF menggunakan fasilitas cetak browser.
-
-## Data contoh lokal
-
-Untuk keperluan demo, `npm run seed:dummy` mengisi database **lokal** dengan data contoh deterministik: sekitar 15 kegiatan, 29 formulir, ribuan respons terpasangkan pretest/posttest dan evaluasi, template, kiriman Bantuan & Masukan, serta jejak audit. Perintah ini menghapus dan menyusun ulang data bisnis lokal setiap dijalankan, mempertahankan akun yang ada (`hrp-admin`, `hrp-ira`) tanpa membuat akun demo tambahan, dan memberi akses seluruh kegiatan contoh kepada akun ber-role staf. Nama pada detail kegiatan (mis. PIC, moderator) hanyalah teks contoh. Data contoh tidak pernah ditulis ke situs online dan tidak termasuk dalam migrasi produksi. Situs private hanya boleh mengambil data nyata dari pengguna.
-
-## Arsitektur
-
-Frontend menggunakan React 19, TypeScript, Vinext, Tailwind, Shadcn/Radix, dan Recharts. Backend berupa API di Cloudflare Workers dengan penyimpanan relasional D1, migrasi Drizzle, serta object storage R2 untuk media. Kueri menggunakan prepared statements. Schema berada di `db/schema.ts`, migrasi di `drizzle/`, domain dan validasi di `lib/domain.ts`, aturan aplikasi di `lib/service.ts`, dan route API di `app/api/[...path]/route.ts`.
-
-Aplikasi pada dasarnya satu organisasi per deployment. Pemisahan antaranggota menggunakan role dan assignment kegiatan; aplikasi ini bukan layanan multi-tenant. Semua data bisnis disimpan di backend. Browser tidak memakai localStorage atau sessionStorage untuk menyimpan jawaban, token sesi, atau data perusahaan. Draf yang belum disimpan tetap berada di memori halaman dan akan hilang jika tab ditutup. Peringatan keluar halaman diaktifkan ketika builder belum disimpan.
-
-Aplikasi menggunakan binding `DB` dan `BUCKET` pada `.sites/hosting.json`. Manifest menyimpan identitas Sites, bukan nilai secret. Runtime memerlukan `APP_ORIGIN`, `DATA_KEY`, dan `SETUP_MODE`. `DATA_KEY` berupa 32 byte acak dalam format 64 karakter heksadesimal. Kunci sudah dikonfigurasi sebagai secret pada publikasi privat ini dan tidak disertakan dalam source. Jangan mengganti atau menghilangkan kunci tanpa prosedur re-enkripsi seluruh ciphertext; kunci yang hilang membuat respons tidak dapat dipulihkan. `APP_ORIGIN` harus persis origin yang digunakan pengunjung untuk melindungi mutasi dari permintaan lintas situs.
-
-`SETUP_MODE=owner-private` membatasi bootstrap administrator ke request yang memiliki identitas pemilik dari dispatcher platform. Mode ini sengaja tidak bisa dipakai pada server yang langsung mempercayai header dari Internet. Setelah organisasi dibuat, endpoint setup tidak dapat membuat administrator tambahan. Untuk deployment di luar Sites, integrasikan bootstrap melalui kanal administratif tepercaya serta implementasikan storage dan proxy/auth boundary yang setara. Mengganti `APP_ORIGIN` saja belum memindahkan aplikasi ke hosting Node/Express biasa.
-
-## Keamanan yang diimplementasikan
-
-Sandi di-hash menggunakan scrypt dengan salt unik, N=16384, r=8, p=5. Parameter ini menggunakan sekitar 16 MiB per derivasi dan merupakan salah satu konfigurasi minimum alternatif yang direkomendasikan [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). Native `node:crypto` digunakan karena tersedia pada [Cloudflare Workers dengan Node compatibility](https://developers.cloudflare.com/workers/runtime-apis/nodejs/crypto/). Plaintext sandi tidak dicatat atau disimpan.
-
-Sesi menggunakan token acak 256-bit, hash token di database, serta cookie host-only `Secure`, `HttpOnly`, dan `SameSite=Strict`. Masa aktif maksimal delapan jam dan timeout tidak aktif satu jam. Logout, perubahan sandi, reset sandi oleh administrator, serta perubahan akses mencabut sesi terkait. Ekspor respons dan perubahan akses/privasi sensitif memerlukan autentikasi ulang jika verifikasi terakhir lebih dari lima menit. Rate limiting disimpan di D1 sehingga tidak mengandalkan memori satu Worker.
-
-Autentikator TOTP bersifat opsional per akun dan dapat diaktifkan melalui Pengaturan Akun. Secret dienkripsi, verifikasi memakai jendela waktu 30 detik dengan toleransi satu langkah, dan counter terakhir mencegah pemakaian ulang kode. Aktivasi belum diwajibkan pada tingkat organisasi. Recovery codes dan pemulihan otomatis jika perangkat hilang belum disediakan. Pemulihan MFA pemilik memerlukan administrator infrastruktur yang berwenang. Jangan menganggap fitur ini sebagai enforcement MFA menyeluruh.
-
-Jawaban dan token tautan yang perlu ditampilkan ulang dienkripsi dengan AES-256-GCM, nonce acak, dan konteks per record. Token akses peserta juga memiliki hash pencarian. Kode pencocokan dipseudonimkan menggunakan HMAC dan lingkup kegiatan. API peserta tidak mengirim kunci jawaban, bobot, skor individual, response lain, maupun akses dashboard. Laporan analis berisi data agregat dan tidak menyediakan jawaban perorangan.
-
-Mutasi memerlukan Origin yang persis sesuai dan custom request header. Aplikasi tidak membuka CORS lintas origin. Pendekatan ini mengikuti pola [custom headers dan validasi origin OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html). Header `no-store`, `no-referrer`, `nosniff`, HSTS, pembatasan izin perangkat, noindex, dan CSP ditambahkan. CSP masih mengizinkan inline script/style untuk kompatibilitas rendering Vinext dan komponen, tetapi tidak mengizinkan arbitrary external scripts atau object embedding. Rich text disimpan sebagai span terstruktur, dirender lewat React, dan link dibatasi ke HTTP(S), sehingga tidak menggunakan HTML pengguna untuk render peserta.
-
-Unggahan memeriksa ukuran aktual dan signature format; SVG/HTML tidak diterima. Media disajikan melalui route yang memeriksa sesi dan akses kegiatan atau token formulir aktif. Malware scanning/CDR serta penghapusan metadata EXIF belum tersedia. Ekspor CSV menetralkan awalan formula spreadsheet. Audit mencatat aktivitas relevan tanpa isi jawaban, plaintext token, sandi, atau IP mentah. Audit ini append-only melalui API aplikasi, tetapi bukan log kriptografis antitamper terhadap administrator database.
-
-## Batas operasional yang perlu diketahui
-
-Pengolahan interaktif respons, CSV respons, dan laporan dibatasi maksimal 5.000 respons per formulir agar sesuai memori Worker. Jika terlampaui, aplikasi menolak pengolahan dan meminta pengolahan batch; aplikasi tidak menampilkan agregat parsial seolah lengkap. Batas ini perlu diganti dengan pagination/streaming dan agregasi bertahap sebelum dipakai pada volume lebih besar. Ekspor rekap kegiatan tetap tersedia secara mandiri. Semua batas input dan unggahan ditegakkan kembali di server.
-
-Retensi default respons 365 hari dan bisa diubah untuk respons baru. Respons kedaluwarsa tidak ditampilkan; penghapusan fisik dijalankan administrator dari Privasi & Akses. Belum ada scheduler purge otomatis, backup independen terjadwal, restore drill, SSO perusahaan, email, WhatsApp API, QR code, report review/approval versioned, atau integrasi Canva/Google Drive. Template tim menggunakan salinan yang tidak mengubah versi asal, tanpa workflow approval. Fitur-fitur ini belum diklaim tersedia.
-
-Halaman Bantuan & Masukan memungkinkan setiap anggota melaporkan error/kendala atau memberi saran pengembangan, dibatasi 10 kiriman per akun per hari dengan pengelolaan status di kotak masuk administrator. Kiriman tersimpan di database aplikasi; lampiran screenshot disimpan privat di R2. Notifikasi Telegram opsional: jika secret `TELEGRAM_TOKEN` dan `TELEGRAM_CHAT_ID` tersedia, kiriman baru diteruskan ke chat yang ditentukan secara best-effort (kegagalan pengiriman tidak menghalangi penyimpanan laporan). Tanpa secret tersebut, laporan tetap dapat dibaca melalui kotak masuk aplikasi.
-
-Hasil ini telah melewati pemeriksaan TypeScript, build, dan pengujian integrasi yang dijelaskan di `VALIDATION.md`. Belum dilakukan pengujian UI di browser nyata, load test, penetration test independen, atau penilaian kepatuhan hukum. Untuk pemakaian data perusahaan secara operasional, tentukan pemilik infrastruktur, backup, rotasi kunci, proses insiden, pemulihan akun, akses tim/peserta, serta kebijakan privasi perusahaan yang sebenarnya.
-
-## Pengembangan
-
-Gunakan Node.js 22.13 atau lebih baru serta Linux/WSL karena script starter menggunakan bash, flock, dan timeout. Pertahankan lockfile. `npm run install:ci` memasang dependency, `npm run db:generate` menghasilkan migrasi schema, `npm run typecheck` memeriksa tipe, dan `npm run test:security` menguji aturan backend dengan SQLite sementara dan object storage tiruan. `npm run build` menghasilkan Worker serta aset. Jangan menjalankan migrasi produksi manual di luar proses deploy Sites; setiap migrasi yang sudah diterapkan harus dianggap immutable.
-
-Geist disajikan dari aset lokal tanpa request font pihak ketiga. Font Geist oleh Vercel berlisensi SIL Open Font License 1.1. Logo HRP berasal dari ZIP yang disediakan pengguna. Tampilan tidak mengambil script, konten survei, maupun integrasi eksternal.
+Laporkan kendala atau beri saran melalui **Bantuan & Masukan** setelah masuk, atau **Saran & masukan** di halaman depan.
