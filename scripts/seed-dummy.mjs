@@ -65,7 +65,7 @@ const bucket = proxy.env.BUCKET;
 try {
   await migrateLocal(db, root);
 
-  const workspace = await db.prepare('SELECT id,name,privacy_notice,privacy_contact,retention_days FROM workspace WHERE id=?').bind('hafecs').first();
+  const workspace = await db.prepare('SELECT id,name,privacy_notice,privacy_contact,retention_days FROM workspace WHERE id=?').bind('hrp-insight').first();
   const existingMembers = (await db.prepare('SELECT id,username,name,role,active FROM members').all()).results;
   if (!workspace || !existingMembers.length) throw new Error('Workspace/akun belum ada. Jalankan npm run setup:local dulu.');
   const admin = existingMembers.find((m) => m.role === 'admin');
@@ -82,9 +82,9 @@ try {
     }
   }
   if (kept.length) console.log('  Mempertahankan akun: ' + kept.map((m) => m.username).join(', ') + '. Tidak ada akun demo yang dibuat.');
-  await db.prepare("UPDATE workspace SET privacy_contact=? WHERE id=?").bind('hrp.hafecs@astra.co.id', 'hafecs').run();
+  await db.prepare("UPDATE workspace SET privacy_contact=? WHERE id=?").bind('hrp@astra.co.id', 'hrp-insight').run();
 
-  const privacySnapshot = JSON.stringify({ name: workspace.name, privacy_notice: workspace.privacy_notice, privacy_contact: 'hrp.hafecs@astra.co.id', retention_days: workspace.retention_days });
+  const privacySnapshot = JSON.stringify({ name: workspace.name, privacy_notice: workspace.privacy_notice, privacy_contact: 'hrp@astra.co.id', retention_days: workspace.retention_days });
 
   const q = (id, type, label, extra = {}) => ({ id, type, label, help: '', required: true, options: [], scale: 5, allowOther: false, scored: false, multiCorrect: [], weight: 1, ...extra });
 
@@ -270,8 +270,8 @@ try {
   const TRAININGS = [
     {
       name: 'IHT Penyusunan Modul Ajar Berbasis AI', program: 'IHT', status: 'Selesai', start_date: '2025-01-13', end_date: '2025-01-15', location: 'Daring – Zoom', facilitator: 'Eko Prasetyo, M.Pd.', theme: 'modul ajar',
-      details: { timezone: 'WIB', method: 'Online', scheme: 'Sosial', duration: 1080, category: 'Teknologi Pembelajaran', grade_level: 'Semua jenjang', organizer: 'HRP Astra', price: 850000, participant_count: 60, pic: 'Rina Kusuma', co_trainer: 'Dewi Lestari', moderator: 'Bayu Pratama', meeting_link: 'https://zoom.us/j/dummy001', registration_link: 'https://forms.hafecs.test/iht-modul-ai', content_link: 'https://drive.hafecs.test/modul-ai', description: 'Pelatihan intensif penyusunan modul ajar digital berbantuan AI untuk guru dan instruktur.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Online', scheme: 'Sosial', duration: 1080, category: 'Teknologi Pembelajaran', grade_level: 'Semua jenjang', organizer: 'HRP Astra', price: 850000, participant_count: 60, pic: 'Rina Kusuma', co_trainer: 'Dewi Lestari', moderator: 'Bayu Pratama', meeting_link: 'https://zoom.us/j/dummy001', registration_link: 'https://forms.hrp-insight.test/iht-modul-ai', content_link: 'https://drive.hrp-insight.test/modul-ai', description: 'Pelatihan intensif penyusunan modul ajar digital berbantuan AI untuk guru dan instruktur.' },
+      access: ['hrp-ira'],
       paired: { codes: 58, preExtra: 3, postExtra: 2, preBias: 0.5, postBias: 0.86, city: 'SBY' },
       forms: [
         { type: 'pretest', title: 'Pre-test Modul Ajar AI', desc: 'Asesmen awal untuk memetakan pemahaman peserta.' },
@@ -281,7 +281,7 @@ try {
     },
     {
       name: 'TLC Pemanfaatan AI untuk Asesmen Pembelajaran', program: 'TLC', status: 'Selesai', start_date: '2025-02-10', end_date: '2025-02-12', location: 'Bandung', facilitator: 'Maria Setiawati, S.Pd.', theme: 'asesmen',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1440, category: 'Asesmen Digital', grade_level: 'SMP', organizer: 'HRP Astra', price: 1200000, participant_count: 48, pic: 'Angga Saputra', moderator: 'Bayu Pratama', registration_link: 'https://forms.hafecs.test/tlc-ai-asesmen', description: 'Pelatihan penggunaan teknologi AI untuk merancang dan menganalisis asesmen pembelajaran.' },
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1440, category: 'Asesmen Digital', grade_level: 'SMP', organizer: 'HRP Astra', price: 1200000, participant_count: 48, pic: 'Angga Saputra', moderator: 'Bayu Pratama', registration_link: 'https://forms.hrp-insight.test/tlc-ai-asesmen', description: 'Pelatihan penggunaan teknologi AI untuk merancang dan menganalisis asesmen pembelajaran.' },
       access: [],
       paired: { codes: 48, preExtra: 1, postExtra: 0, preBias: 0.55, postBias: 0.83, city: 'BDG' },
       forms: [
@@ -293,12 +293,12 @@ try {
     {
       name: 'Bootcamp Analisis Data dengan Excel Lanjutan', program: 'Bootcamp', status: 'Selesai', start_date: '2025-03-03', end_date: '2025-03-07', location: 'Jakarta', facilitator: 'Hendra Wijaya', theme: 'analisis data',
       details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 3000, category: 'Data & Statistik', grade_level: 'Semua jenjang', organizer: 'HRP Astra', price: 2500000, participant_count: 160, pic: 'Rina Kusuma', co_trainer: 'Angga Saputra', moderator: 'Dewi Lestari', meeting_link: 'https://zoom.us/j/dummy003', description: 'Pelatihan intensif lima hari pengolahan dan visualisasi data pendidikan menggunakan Excel lanjutan.' },
-      access: ['hafecs-ira'],
+      access: ['hrp-ira'],
       forms: [{ type: 'evaluasi', title: 'Evaluasi Bootcamp Excel Lanjutan', desc: 'Umpan balik kegiatan lima hari.', n: 160 }],
     },
     {
       name: 'Elevate Class Kepemimpinan Instruktur', program: 'Elevate Class', status: 'Selesai', start_date: '2025-04-14', end_date: '2025-04-16', location: 'Surabaya', facilitator: 'Prof. Bambang Riyadi', theme: 'kepemimpinan',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1320, category: 'Kepemimpinan', grade_level: 'Guru', organizer: 'HRP Astra', price: 950000, participant_count: 90, pic: 'Angga Saputra', moderator: 'Dewi Lestari', registration_link: 'https://forms.hafecs.test/elevate-kepemimpinan', content_link: 'https://drive.hafecs.test/elevate-lead', description: 'Kelas pengembangan kepemimpinan bagi instruktur dan calon fasilitator.' },
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1320, category: 'Kepemimpinan', grade_level: 'Guru', organizer: 'HRP Astra', price: 950000, participant_count: 90, pic: 'Angga Saputra', moderator: 'Dewi Lestari', registration_link: 'https://forms.hrp-insight.test/elevate-kepemimpinan', content_link: 'https://drive.hrp-insight.test/elevate-lead', description: 'Kelas pengembangan kepemimpinan bagi instruktur dan calon fasilitator.' },
       access: [],
       forms: [
         { type: 'evaluasi', title: 'Evaluasi Elevate Class Kepemimpinan', desc: 'Penilaian kegiatan dan fasilitator.', n: 120 },
@@ -307,8 +307,8 @@ try {
     },
     {
       name: 'ACCEL Kelas Menulis Artikel Ilmiah', program: 'ACCEL', status: 'Selesai', start_date: '2025-05-19', end_date: '2025-05-23', location: 'Daring – Google Meet', facilitator: 'Dr. Sari Nugroho', theme: 'artikel ilmiah',
-      details: { timezone: 'WIB', method: 'Online', scheme: 'Sosial', duration: 2000, category: 'Publikasi Ilmiah', grade_level: 'Semua', organizer: 'HRP Astra', price: 1500000, participant_count: 40, pic: 'Dewi Lestari', moderator: 'Bayu Pratama', meeting_link: 'https://meet.google.com/dummy005', documentation_url: 'https://drive.hafecs.test/accel-paper', description: 'Pelatihan akselerasi penulisan artikel ilmiah untuk publikasi jurnal.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Online', scheme: 'Sosial', duration: 2000, category: 'Publikasi Ilmiah', grade_level: 'Semua', organizer: 'HRP Astra', price: 1500000, participant_count: 40, pic: 'Dewi Lestari', moderator: 'Bayu Pratama', meeting_link: 'https://meet.google.com/dummy005', documentation_url: 'https://drive.hrp-insight.test/accel-paper', description: 'Pelatihan akselerasi penulisan artikel ilmiah untuk publikasi jurnal.' },
+      access: ['hrp-ira'],
       paired: { codes: 40, preExtra: 0, postExtra: 1, preBias: 0.52, postBias: 0.88, city: 'JKT' },
       forms: [
         { type: 'pretest', title: 'Pre-test Penulisan Artikel', desc: 'Asesmen kemampuan awal menulis.' },
@@ -319,13 +319,13 @@ try {
     {
       name: 'Open Class Literasi Keuangan untuk Guru', program: 'Open Class', status: 'Selesai', start_date: '2025-06-09', end_date: '2025-06-09', location: 'Daring – YouTube', facilitator: 'Tim OJK & HRP', theme: 'literasi keuangan',
       details: { timezone: 'WIB', method: 'Online', scheme: 'Sosial', duration: 180, category: 'Literasi Keuangan', grade_level: 'Semua', organizer: 'HRP Astra', price: 0, participant_count: 200, pic: 'Bayu Pratama', moderator: 'Rina Kusuma', meeting_link: 'https://youtube.com/live/dummy006', description: 'Kelas terbuka literasi keuangan bagi guru dan tenaga kependidikan.' },
-      access: ['hafecs-ira'],
+      access: ['hrp-ira'],
       forms: [{ type: 'evaluasi', title: 'Evaluasi Open Class Literasi Keuangan', desc: 'Umpan balik kelas terbuka.', n: 200 }],
     },
     {
       name: 'IHT Kurikulum Merdeka Berdiferensiasi', program: 'IHT', status: 'Selesai', start_date: '2025-08-11', end_date: '2025-08-13', location: 'Yogyakarta', facilitator: 'Dra. Endah Wulandari, M.Pd.', theme: 'kurikulum',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Sosial', duration: 1440, category: 'Kurikulum Merdeka', grade_level: 'SD/MI', organizer: 'HRP Astra', price: 700000, participant_count: 72, pic: 'Dewi Lestari', co_trainer: 'Eko Prasetyo', moderator: 'Bayu Pratama', registration_link: 'https://forms.hafecs.test/iht-kurikulum', content_link: 'https://drive.hafecs.test/berdiferensiasi', description: 'In-house training penetapan pembelajaran berdiferensiasi dalam Kurikulum Merdeka.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Sosial', duration: 1440, category: 'Kurikulum Merdeka', grade_level: 'SD/MI', organizer: 'HRP Astra', price: 700000, participant_count: 72, pic: 'Dewi Lestari', co_trainer: 'Eko Prasetyo', moderator: 'Bayu Pratama', registration_link: 'https://forms.hrp-insight.test/iht-kurikulum', content_link: 'https://drive.hrp-insight.test/berdiferensiasi', description: 'In-house training penetapan pembelajaran berdiferensiasi dalam Kurikulum Merdeka.' },
+      access: ['hrp-ira'],
       paired: { codes: 72, preExtra: 2, postExtra: 0, preBias: 0.48, postBias: 0.84, city: 'YOG' },
       forms: [
         { type: 'pretest', title: 'Pre-test Pembelajaran Berdiferensiasi', desc: 'Pemetaan awal pemahaman kurikulum.' },
@@ -335,8 +335,8 @@ try {
     },
     {
       name: 'Kolaborasi Penelitian Tindakan Kelas', program: 'Kolaborasi', status: 'Berlangsung', start_date: '2025-11-17', end_date: '2025-11-21', location: 'Daring – Zoom', facilitator: 'Dr. Ahmad Fauzi', theme: 'PTK',
-      details: { timezone: 'WIB', method: 'Online', scheme: 'Komersil', duration: 2200, category: 'Penelitian', grade_level: 'Semua', organizer: 'LPMP & HRP', price: 1800000, participant_count: 55, pic: 'Rina Kusuma', moderator: 'Angga Saputra', registration_link: 'https://forms.hafecs.test/kolaborasi-ptk', meeting_link: 'https://zoom.us/j/dummy008', description: 'Kegiatan kolaborasi penyusunan dan pelaksanaan penelitian tindakan kelas.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Online', scheme: 'Komersil', duration: 2200, category: 'Penelitian', grade_level: 'Semua', organizer: 'LPMP & HRP', price: 1800000, participant_count: 55, pic: 'Rina Kusuma', moderator: 'Angga Saputra', registration_link: 'https://forms.hrp-insight.test/kolaborasi-ptk', meeting_link: 'https://zoom.us/j/dummy008', description: 'Kegiatan kolaborasi penyusunan dan pelaksanaan penelitian tindakan kelas.' },
+      access: ['hrp-ira'],
       paired: { codes: 55, preExtra: 1, postExtra: 0, preBias: 0.5, postBias: 0.8, city: 'MDN' },
       forms: [
         { type: 'pretest', title: 'Pre-test PTK', desc: 'Asesmen awal metodologi penelitian.' },
@@ -346,8 +346,8 @@ try {
     },
     {
       name: 'TLC Fasilitasi Pembelajaran Daring', program: 'TLC', status: 'Berlangsung', start_date: '2026-01-12', end_date: '2026-01-16', location: 'Malang', facilitator: 'Novita Sari, M.Pd.', theme: 'fasilitasi daring',
-      details: { timezone: 'WIB', method: 'Hybrid', scheme: 'Komersil', duration: 1600, category: 'Fasilitasi', grade_level: 'Semua', organizer: 'HRP Astra', price: 1300000, participant_count: 90, pic: 'Dewi Lestari', co_trainer: 'Bayu Pratama', moderator: 'Rina Kusuma', content_link: 'https://drive.hafecs.test/fasilitasi', group_link: 'https://t.me/hafecs_fasilitasi', description: 'Pelatihan kapasitas fasilitator pembelajaran daring dengan praktik langsung.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Hybrid', scheme: 'Komersil', duration: 1600, category: 'Fasilitasi', grade_level: 'Semua', organizer: 'HRP Astra', price: 1300000, participant_count: 90, pic: 'Dewi Lestari', co_trainer: 'Bayu Pratama', moderator: 'Rina Kusuma', content_link: 'https://drive.hrp-insight.test/fasilitasi', group_link: 'https://t.me/hrp_insight_fasilitasi', description: 'Pelatihan kapasitas fasilitator pembelajaran daring dengan praktik langsung.' },
+      access: ['hrp-ira'],
       forms: [
         { type: 'pra_sesi', title: 'Pra-Sesi Fasilitasi Daring', desc: 'Survei awal sebelum pelatihan.', n: 90 },
         { type: 'pasca_sesi', title: 'Pasca-Sesi Fasilitasi Daring', desc: 'Refleksi setelah pelatihan.', n: 90 },
@@ -355,7 +355,7 @@ try {
     },
     {
       name: 'Bootcamp Desain Presentasi Efektif', program: 'Bootcamp', status: 'Rencana', start_date: '2026-02-16', end_date: '2026-02-20', location: 'Jakarta', facilitator: 'Belum ditentukan', theme: 'presentasi',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 2400, category: 'Komunikasi', grade_level: 'Semua', organizer: 'HRP Astra', price: 2000000, participant_count: 120, pic: 'Angga Saputra', moderator: 'Rina Kusuma', registration_link: 'https://forms.hafecs.test/bootcamp-presentasi', description: 'Rencana bootcamp keterampilan menyusun dan menyampaikan presentasi efektif.' },
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 2400, category: 'Komunikasi', grade_level: 'Semua', organizer: 'HRP Astra', price: 2000000, participant_count: 120, pic: 'Angga Saputra', moderator: 'Rina Kusuma', registration_link: 'https://forms.hrp-insight.test/bootcamp-presentasi', description: 'Rencana bootcamp keterampilan menyusun dan menyampaikan presentasi efektif.' },
       access: [],
       forms: [
         { type: 'pretest', title: 'Pre-test Desain Presentasi', desc: 'Rencana asesmen awal (draft).', status: 'draft' },
@@ -364,13 +364,13 @@ try {
     },
     {
       name: 'Research Academy Workshop Statistika Penelitian', program: 'Research Academy', status: 'Berlangsung', start_date: '2026-03-09', end_date: '2026-03-11', location: 'Daring – Zoom', facilitator: 'Dr. Yusuf Hakim', theme: 'statistika',
-      details: { timezone: 'WIB', method: 'Online', scheme: 'Komersil', duration: 1200, category: 'Statistika Penelitian', grade_level: 'Semua', organizer: 'HRP & Universitas Mitra', price: 1100000, participant_count: 50, pic: 'Bayu Pratama', co_trainer: 'Angga Saputra', moderator: 'Dewi Lestari', registration_link: 'https://forms.hafecs.test/academy-stat', meeting_link: 'https://zoom.us/j/dummy011', description: 'Workshop statistika untuk peneliti dan penyusun karya ilmiah.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Online', scheme: 'Komersil', duration: 1200, category: 'Statistika Penelitian', grade_level: 'Semua', organizer: 'HRP & Universitas Mitra', price: 1100000, participant_count: 50, pic: 'Bayu Pratama', co_trainer: 'Angga Saputra', moderator: 'Dewi Lestari', registration_link: 'https://forms.hrp-insight.test/academy-stat', meeting_link: 'https://zoom.us/j/dummy011', description: 'Workshop statistika untuk peneliti dan penyusun karya ilmiah.' },
+      access: ['hrp-ira'],
       forms: [{ type: 'kebutuhan', title: 'Survei Kebutuhan Workshop Statistika', desc: 'Pendaftaran dan pemetaan kebutuhan peserta.', n: 50 }],
     },
     {
       name: 'Open Class Parenting Digital', program: 'Open Class', status: 'Selesai', start_date: '2025-09-15', end_date: '2025-09-15', location: 'Surabaya', facilitator: 'Psikolog Nadia Rahmawati', theme: 'parenting',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Sosial', duration: 240, category: 'Parenting', grade_level: 'Orang tua', organizer: 'HRP Astra', price: 0, participant_count: 180, pic: 'Dewi Lestari', moderator: 'Rina Kusuma', documentation_url: 'https://drive.hafecs.test/parenting', description: 'Kelas terbuka pengasuhan digital untuk orang tua peserta didik.' },
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Sosial', duration: 240, category: 'Parenting', grade_level: 'Orang tua', organizer: 'HRP Astra', price: 0, participant_count: 180, pic: 'Dewi Lestari', moderator: 'Rina Kusuma', documentation_url: 'https://drive.hrp-insight.test/parenting', description: 'Kelas terbuka pengasuhan digital untuk orang tua peserta didik.' },
       access: [],
       forms: [
         { type: 'evaluasi', title: 'Evaluasi Open Class Parenting', desc: 'Umpan balik kelas parenting.', n: 180 },
@@ -379,20 +379,20 @@ try {
     },
     {
       name: 'Training Public Speaking bagi Trainer', program: 'Training', status: 'Selesai', start_date: '2025-02-24', end_date: '2025-02-26', location: 'Semarang', facilitator: 'Rudi Hartono, S.E.', theme: 'public speaking',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1200, category: 'Public Speaking', grade_level: 'Trainer', organizer: 'HRP Astra', price: 900000, participant_count: 120, pic: 'Bayu Pratama', co_trainer: 'Novita Sari', moderator: 'Dewi Lestari', registration_link: 'https://forms.hafecs.test/public-speaking', content_link: 'https://drive.hafecs.test/speaking', description: 'Pelatihan keterampilan berbicara di depan umum bagi calon trainer.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1200, category: 'Public Speaking', grade_level: 'Trainer', organizer: 'HRP Astra', price: 900000, participant_count: 120, pic: 'Bayu Pratama', co_trainer: 'Novita Sari', moderator: 'Dewi Lestari', registration_link: 'https://forms.hrp-insight.test/public-speaking', content_link: 'https://drive.hrp-insight.test/speaking', description: 'Pelatihan keterampilan berbicara di depan umum bagi calon trainer.' },
+      access: ['hrp-ira'],
       forms: [{ type: 'evaluasi', title: 'Evaluasi Public Speaking Trainer', desc: 'Umpan balik penyelenggaraan.', n: 120 }],
     },
     {
       name: 'Elevate Class Transformasi Digital Pembelajaran', program: 'Elevate Class', status: 'Berlangsung', start_date: '2026-05-18', end_date: '2026-05-20', location: 'Jakarta', facilitator: 'Ibu Ratna Komala, M.M.', theme: 'transformasi digital',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1080, category: 'Digitalisasi', grade_level: 'Semua', organizer: 'HRP Astra', price: 1000000, participant_count: 45, pic: 'Rina Kusuma', moderator: 'Angga Saputra', meeting_link: 'https://zoom.us/j/dummy014', content_link: 'https://drive.hafecs.test/transformasi', description: 'Kelas pengembangan transformasi digital pembelajaran bagi sekolah mitra.' },
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Komersil', duration: 1080, category: 'Digitalisasi', grade_level: 'Semua', organizer: 'HRP Astra', price: 1000000, participant_count: 45, pic: 'Rina Kusuma', moderator: 'Angga Saputra', meeting_link: 'https://zoom.us/j/dummy014', content_link: 'https://drive.hrp-insight.test/transformasi', description: 'Kelas pengembangan transformasi digital pembelajaran bagi sekolah mitra.' },
       access: [],
       forms: [{ type: 'evaluasi', title: 'Evaluasi Transformasi Digital', desc: 'Umpan balik kelas digitalisasi.', n: 45 }],
     },
     {
       name: 'IHT Asesmen Diagnostik', program: 'IHT', status: 'Selesai', start_date: '2025-05-05', end_date: '2025-05-07', location: 'Palembang', facilitator: 'Sukma Wijaya, M.Pd.', theme: 'asesmen diagnostik',
-      details: { timezone: 'WIB', method: 'Offline', scheme: 'Sosial', duration: 1320, category: 'Asesmen', grade_level: 'SD–SMA', organizer: 'HRP Astra', price: 650000, participant_count: 150, pic: 'Dewi Lestari', co_trainer: 'Eko Prasetyo', moderator: 'Rina Kusuma', registration_link: 'https://forms.hafecs.test/iht-diagnostik', documentation_url: 'https://drive.hafecs.test/diagnostik', description: 'Pelatihan merancang dan menginterpretasi asesmen diagnostik kognitif dan non-kognitif.' },
-      access: ['hafecs-ira'],
+      details: { timezone: 'WIB', method: 'Offline', scheme: 'Sosial', duration: 1320, category: 'Asesmen', grade_level: 'SD–SMA', organizer: 'HRP Astra', price: 650000, participant_count: 150, pic: 'Dewi Lestari', co_trainer: 'Eko Prasetyo', moderator: 'Rina Kusuma', registration_link: 'https://forms.hrp-insight.test/iht-diagnostik', documentation_url: 'https://drive.hrp-insight.test/diagnostik', description: 'Pelatihan merancang dan menginterpretasi asesmen diagnostik kognitif dan non-kognitif.' },
+      access: ['hrp-ira'],
       forms: [{ type: 'evaluasi', title: 'Evaluasi IHT Asesmen Diagnostik', desc: 'Umpan balik kegiatan.', n: 150 }],
     },
   ];
@@ -508,9 +508,9 @@ try {
   }
 
   const HELP = [
-    ['hafecs-ira', 'bug', 'Halaman formulir tidak bisa dibuka saat mengisi pretest di ponsel.', 'baru', 12],
-    ['hafecs-ira', 'bug', 'Tombol unduh CSV pada daftar respons mengunduh file kosong saat filter aktif.', 'diproses', 20],
-    ['hafecs-ira', 'saran', 'Tambahkan fitur rekap otomatis ke format PDF dari halaman laporan.', 'selesai', 34],
+    ['hrp-ira', 'bug', 'Halaman formulir tidak bisa dibuka saat mengisi pretest di ponsel.', 'baru', 12],
+    ['hrp-ira', 'bug', 'Tombol unduh CSV pada daftar respons mengunduh file kosong saat filter aktif.', 'diproses', 20],
+    ['hrp-ira', 'saran', 'Tambahkan fitur rekap otomatis ke format PDF dari halaman laporan.', 'selesai', 34],
     ['dewi-hrp', 'saran', 'Mohon ada pencarian cepat pada daftar kegiatan agar lebih efisien.', 'diproses', 16],
     ['rina-hrp', 'bug', 'Notifikasi Telegram tidak terkirim ketika kiriman membantu diterima.', 'selesai', 8],
     ['bayu-hrp', 'saran', 'Tambahkan opsi ekspor grafik laporan menjadi gambar PNG.', 'baru', 5],
@@ -527,8 +527,8 @@ try {
   }
 
   const nowMs = Date.now();
-  logAudit(admin.id, admin.name, 'workspace.setup.local', 'hafecs', '', spreadDays(0, nowMs - 560 * DAY, nowMs - 540 * DAY));
-  logAudit(admin.id, admin.name, 'privacy.update', 'hafecs', '', spreadDays(0, nowMs - 300 * DAY, nowMs - 290 * DAY));
+  logAudit(admin.id, admin.name, 'workspace.setup.local', 'hrp-insight', '', spreadDays(0, nowMs - 560 * DAY, nowMs - 540 * DAY));
+  logAudit(admin.id, admin.name, 'privacy.update', 'hrp-insight', '', spreadDays(0, nowMs - 300 * DAY, nowMs - 290 * DAY));
   for (let i = 0; i < 22; i++) {
     const username = pick(Object.keys(byUsername));
     const m = byUsername[username];
@@ -541,13 +541,13 @@ try {
     if (m.role === 'admin') continue;
     logAudit(admin.id, admin.name, 'member.create', m.id, '', spreadDays(0, nowMs - 500 * DAY, nowMs - 350 * DAY));
   }
-  if (byUsername['hafecs-ira']) {
-    const m = byUsername['hafecs-ira'];
+  if (byUsername['hrp-ira']) {
+    const m = byUsername['hrp-ira'];
     logAudit(m.id, m.name, 'account.password', m.id, '', spreadDays(0, nowMs - 340 * DAY, nowMs - 300 * DAY));
   }
   logAudit(admin.id, admin.name, 'responses.read', null, '', spreadDays(0, nowMs - 14 * DAY, nowMs - 1 * DAY));
   logAudit(admin.id, admin.name, 'responses.export', null, '', spreadDays(0, nowMs - 10 * DAY, nowMs - 2 * DAY));
-  logAudit('hafecs-ira' in byUsername ? byUsername['hafecs-ira'].id : admin.id, (byUsername['hafecs-ira'] || admin).name, 'response.exclude', null, 'Keputusan kualitas data disimpan', spreadDays(0, nowMs - 6 * DAY, nowMs - 1 * DAY));
+  logAudit('hrp-ira' in byUsername ? byUsername['hrp-ira'].id : admin.id, (byUsername['hrp-ira'] || admin).name, 'response.exclude', null, 'Keputusan kualitas data disimpan', spreadDays(0, nowMs - 6 * DAY, nowMs - 1 * DAY));
 
   for (const row of audit) {
     stmts.push(db.prepare('INSERT INTO audit (id,actor_id,actor_name,action,target_id,detail,created_at) VALUES (?,?,?,?,?,?,?)').bind(row[0], row[1], row[2], row[3], row[4], row[5], row[6]));

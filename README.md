@@ -1,8 +1,8 @@
-# HAFECS Insight
+# HRP Insight
 
 Untuk menjalankan ZIP di Windows, ikuti [MULAI-WINDOWS.md](MULAI-WINDOWS.md): jalankan `npm run setup:local` setelah instalasi dependency, lalu `npm run dev`. Admin lokal dibuat melalui terminal, dan database lokal terpisah dari situs online.
 
-Aplikasi full stack untuk pengelolaan kegiatan pelatihan, formulir, respons, asesmen, dan laporan HAFECS Research and Publication. Implementasi mengikuti proyek ZIP serta daftar revisi pengguna. Data kegiatan dan respons hanya dapat dimasukkan oleh pengguna aplikasi; data contoh untuk demo lokal dibuat melalui `npm run seed:dummy` dan tidak pernah masuk ke database produksi.
+Aplikasi full stack untuk pengelolaan kegiatan pelatihan, formulir, respons, asesmen, dan laporan Research & Publication. Implementasi mengikuti proyek ZIP serta daftar revisi pengguna. Data kegiatan dan respons hanya dapat dimasukkan oleh pengguna aplikasi; data contoh untuk demo lokal dibuat melalui `npm run seed:dummy` dan tidak pernah masuk ke database produksi.
 
 ## Mulai menggunakan
 
@@ -22,7 +22,7 @@ Setelah respons pertama, struktur, kunci jawaban, dan konfigurasi pairing terkun
 
 ## Data contoh lokal
 
-Untuk keperluan demo, `npm run seed:dummy` mengisi database **lokal** dengan data contoh deterministik: sekitar 15 kegiatan, 29 formulir, ribuan respons terpasangkan pretest/posttest dan evaluasi, template, kiriman Bantuan & Masukan, serta jejak audit. Perintah ini menghapus dan menyusun ulang data bisnis lokal setiap dijalankan, mempertahankan akun yang ada (`hafecs-admin`, `hafecs-ira`) tanpa membuat akun demo tambahan, dan memberi akses seluruh kegiatan contoh kepada akun ber-role staf. Nama pada detail kegiatan (mis. PIC, moderator) hanyalah teks contoh. Data contoh tidak pernah ditulis ke situs online dan tidak termasuk dalam migrasi produksi. Situs private hanya boleh mengambil data nyata dari pengguna.
+Untuk keperluan demo, `npm run seed:dummy` mengisi database **lokal** dengan data contoh deterministik: sekitar 15 kegiatan, 29 formulir, ribuan respons terpasangkan pretest/posttest dan evaluasi, template, kiriman Bantuan & Masukan, serta jejak audit. Perintah ini menghapus dan menyusun ulang data bisnis lokal setiap dijalankan, mempertahankan akun yang ada (`hrp-admin`, `hrp-ira`) tanpa membuat akun demo tambahan, dan memberi akses seluruh kegiatan contoh kepada akun ber-role staf. Nama pada detail kegiatan (mis. PIC, moderator) hanyalah teks contoh. Data contoh tidak pernah ditulis ke situs online dan tidak termasuk dalam migrasi produksi. Situs private hanya boleh mengambil data nyata dari pengguna.
 
 ## Arsitektur
 

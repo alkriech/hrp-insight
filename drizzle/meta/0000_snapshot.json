@@ -1012,7 +1012,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'Data digunakan oleh HAFECS Research and Publication untuk evaluasi dan peningkatan kualitas pelatihan. Identitas hanya dapat diakses oleh petugas yang berwenang.'"
+          "default": "'Data digunakan oleh HRP Insight untuk evaluasi dan peningkatan kualitas pelatihan. Identitas hanya dapat diakses oleh petugas yang berwenang.'"
         },
         "created_at": {
           "name": "created_at",

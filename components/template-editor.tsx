@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Trash2, ArrowUp, ArrowDown, Save } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown, Save, FileDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { api, Action, Field, Pick, Modal, message } from './app-ui';
+import { ImportQuestionsModal } from './question-import';
 import { RichEditor } from './rich-editor';
 import { QUESTION_TYPES, FORM_TYPES, newQuestion, type Question } from '@/lib/domain';
 import { toast } from 'sonner';
@@ -35,15 +36,18 @@ export function TemplateEditModal({ open, onOpenChange, template, onSaved }: {
     const [questions, setQuestions] = useState<Question[]>(() => (template?.questions ?? []).map((q: Question) => ({ ...q })));
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
+    const [importOpen, setImportOpen] = useState(false);
     const updateQuestion = (id: string, patch: Partial<Question>) => setQuestions(qs => qs.map(q => q.id === id ? { ...q, ...patch } : q));
     const move = (id: string, dir: -1 | 1) => setQuestions(qs => { const i = qs.findIndex(q => q.id === id); if (i < 0) return qs; const j = i + dir; if (j < 0 || j >= qs.length) return qs; const next = [...qs]; [next[i], next[j]] = [next[j], next[i]]; return next; });
     const remove = (id: string) => setQuestions(qs => qs.filter(q => q.id !== id));
     async function save(e: React.FormEvent) {
         e.preventDefault();
-        if (!template) return;
         setBusy(true);
         try {
-            await api('templates/' + template.id, 'PUT', { title, type, description, questions });
+            if (template)
+                await api('templates/' + template.id, 'PUT', { title, type, description, questions });
+            else
+                await api('templates', 'POST', { title, type, description, questions });
             toast.success('Template disimpan.');
             onSaved();
         }
@@ -54,8 +58,8 @@ export function TemplateEditModal({ open, onOpenChange, template, onSaved }: {
             setBusy(false);
         }
     }
-    return <Modal open={open} onOpenChange={onOpenChange} title="Edit template" wide><div className="stack dialog-scroll"><form className="stack" onSubmit={save}><div className="settings-grid"><section className="panel padded stack"><h2>Informasi template</h2><Field label="Nama template"><Input required value={title} onChange={e => setTitle(e.target.value)}/></Field><Field label="Tipe template"><Pick value={type} onChange={setType} options={FORM_TYPES as [
+    return <Modal open={open} onOpenChange={onOpenChange} title={template ? 'Edit template' : 'Buat template'} wide><div className="stack dialog-scroll"><form className="stack" onSubmit={save}><div className="settings-grid"><section className="panel padded stack"><h2>Informasi template</h2><Field label="Nama template"><Input required value={title} onChange={e => setTitle(e.target.value)}/></Field><Field label="Tipe template"><Pick value={type} onChange={setType} options={FORM_TYPES as [
             string,
             string
-        ][]} label="Tipe template"/></Field><Field label="Deskripsi template"><Textarea rows={2} value={description} onChange={e => setDescription(e.target.value)}/></Field></section></div><h2>Pertanyaan</h2>{!questions.length ? <p className="muted">Belum ada pertanyaan.</p> : questions.map((q, i) => <TemplateQuestion key={q.id} q={q} onChange={patch => updateQuestion(q.id, patch)} onMove={dir => move(q.id, dir)} onRemove={() => remove(q.id)} first={i === 0} last={i === questions.length - 1}/>)}<div className="add-toolbar"><Action type="button" variant="outline" onClick={() => setQuestions(qs => [...qs, newQuestion()])}><Plus size={16}/> Pertanyaan</Action><Action type="button" variant="outline" onClick={() => setQuestions(qs => [...qs, newQuestion('section')])}><Plus size={16}/> Tambah judul</Action><Action type="button" variant="outline" onClick={() => setQuestions(qs => [...qs, newQuestion('pagebreak')])}><Plus size={16}/> Tambah bagian</Action><Action type="submit" busy={busy}><Save size={16}/> Simpan</Action></div>{error && <p className="error-box">{error}</p>}</form></div></Modal>;
+        ][]} label="Tipe template"/></Field><Field label="Deskripsi template"><Textarea rows={2} value={description} onChange={e => setDescription(e.target.value)}/></Field></section></div><h2>Pertanyaan</h2>{!questions.length ? <p className="muted">Belum ada pertanyaan.</p> : questions.map((q, i) => <TemplateQuestion key={q.id} q={q} onChange={patch => updateQuestion(q.id, patch)} onMove={dir => move(q.id, dir)} onRemove={() => remove(q.id)} first={i === 0} last={i === questions.length - 1}/>)}<div className="add-toolbar"><Action type="button" variant="outline" onClick={() => setQuestions(qs => [...qs, newQuestion()])}><Plus size={16}/> Pertanyaan</Action><Action type="button" variant="outline" onClick={() => setQuestions(qs => [...qs, newQuestion('section')])}><Plus size={16}/> Tambah judul</Action><Action type="button" variant="outline" onClick={() => setQuestions(qs => [...qs, newQuestion('pagebreak')])}><Plus size={16}/> Tambah bagian</Action><Action type="button" variant="outline" onClick={() => setImportOpen(true)}><FileDown size={16}/> Import pertanyaan</Action><Action type="submit" busy={busy}><Save size={16}/> Simpan</Action></div>{error && <p className="error-box">{error}</p>}</form><ImportQuestionsModal open={importOpen} onOpenChange={setImportOpen} onImport={qs => setQuestions(prev => [...prev, ...qs])}/></div></Modal>;
 }

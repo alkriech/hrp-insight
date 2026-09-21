@@ -36,6 +36,13 @@
       "when": 1789626015349,
       "tag": "0004_cleanup_help_media",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1789868609034,
+      "tag": "0005_lively_paibok",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,7 @@ export class HttpError extends Error {
     constructor(public status: number, message: string) { super(message); }
 }
 export function fail(status: number, message: string): never { throw new HttpError(status, message); }
-export function requireMutationOrigin(request: Request, allowedOrigin: string) { if (request.headers.get('origin') !== allowedOrigin || request.headers.get('sec-fetch-site') === 'cross-site' || request.headers.get('x-hafecs-request') !== '1')
+export function requireMutationOrigin(request: Request, allowedOrigin: string) { if (request.headers.get('origin') !== allowedOrigin || request.headers.get('sec-fetch-site') === 'cross-site' || request.headers.get('x-hrp-insight-request') !== '1')
     fail(403, 'Permintaan tidak dapat diverifikasi. Muat ulang halaman dan coba lagi.'); }
 export const randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), v => v.toString(16).padStart(2, '0')).join('');
 export async function sha256(s: string) { return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))), v => v.toString(16).padStart(2, '0')).join(''); }

@@ -12,7 +12,7 @@ process.env.WRANGLER_LOG_PATH='.wrangler/logs';
 buildSync({entryPoints:['lib/service.ts'],bundle:true,platform:'node',format:'esm',outdir:'.test-build',logLevel:'silent'});
 const {createService}=await import('../.test-build/service.js');
 await test('local migrations, admin, real D1 persistence, login and R2',async()=>{
- const dir=await mkdtemp(path.join(tmpdir(),'hafecs-local-'));
+ const dir=await mkdtemp(path.join(tmpdir(),'hrp-insight-local-'));
  const options={configPath:path.resolve('wrangler.local.json'),persist:{path:dir},remoteBindings:false};
  let proxy=await getPlatformProxy(options);
  try {
@@ -24,7 +24,7 @@ await test('local migrations, admin, real D1 persistence, login and R2',async()=
   const service=createService({...proxy.env,DATA_KEY:randomBytes(32).toString('hex'),APP_ORIGIN,SETUP_MODE:'disabled'});
   const session=await service(new Request(APP_ORIGIN+'/api/session'));
   assert.equal(session.status,200);assert.equal((await session.json()).needs_setup,false);
-  const login=await service(new Request(APP_ORIGIN+'/api/login',{method:'POST',headers:{Origin:APP_ORIGIN,'X-Hafecs-Request':'1','Content-Type':'application/json'},body:JSON.stringify({username:'localadmin',password})}));
+  const login=await service(new Request(APP_ORIGIN+'/api/login',{method:'POST',headers:{Origin:APP_ORIGIN,'X-Hrp-Insight-Request':'1','Content-Type':'application/json'},body:JSON.stringify({username:'localadmin',password})}));
   assert.equal(login.status,200,await login.clone().text());
   const cookie=login.headers.get('set-cookie').split(';')[0];
   const authenticated=await service(new Request(APP_ORIGIN+'/api/session',{headers:{Cookie:cookie}}));

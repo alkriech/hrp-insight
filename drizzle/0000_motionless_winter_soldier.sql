@@ -144,6 +144,6 @@ CREATE TABLE `workspace` (
 	`owner_id` text NOT NULL,
 	`retention_days` integer DEFAULT 365 NOT NULL,
 	`privacy_contact` text DEFAULT '' NOT NULL,
-	`privacy_notice` text DEFAULT 'Data digunakan oleh HAFECS Research and Publication untuk evaluasi dan peningkatan kualitas pelatihan. Identitas hanya dapat diakses oleh petugas yang berwenang.' NOT NULL,
+	`privacy_notice` text DEFAULT 'Data digunakan oleh HRP Insight untuk evaluasi dan peningkatan kualitas pelatihan. Identitas hanya dapat diakses oleh petugas yang berwenang.' NOT NULL,
 	`created_at` text NOT NULL
 );

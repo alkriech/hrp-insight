@@ -1150,7 +1150,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'HAFECS Research and Publication menggunakan data peserta untuk mengevaluasi dan memperbaiki kualitas pelatihan. Identitas peserta hanya dapat diakses oleh petugas yang berwenang.'"
+          "default": "'HRP Insight menggunakan data peserta untuk mengevaluasi dan memperbaiki kualitas pelatihan. Identitas peserta hanya dapat diakses oleh petugas yang berwenang.'"
         },
         "created_at": {
           "name": "created_at",

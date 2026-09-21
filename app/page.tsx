@@ -1,1 +1,1 @@
-export { Workspace as default } from '@/components/workspace';
+export { default } from '@/components/landing';

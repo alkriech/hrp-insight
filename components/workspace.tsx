@@ -14,7 +14,7 @@ import { TeamPage, SettingsPage, AccountPage, AuditPage } from './settings';
 import { HelpPage } from './help';
 import type { Member, Training } from '@/lib/domain';
 import { toast } from 'sonner';
-const nav = [['/', 'Ringkasan', LayoutDashboard], ['/kegiatan', 'Rekap pelatihan', CalendarDays], ['/formulir', 'Formulir', ClipboardList], ['/template', 'Template formulir', Library], ['/laporan', 'Laporan dan analisis', BarChart3]] as const;
+const nav = [['/ringkasan', 'Ringkasan', LayoutDashboard], ['/kegiatan', 'Rekap pelatihan', CalendarDays], ['/formulir', 'Formulir', ClipboardList], ['/template', 'Template formulir', Library], ['/laporan', 'Laporan dan analisis', BarChart3]] as const;
 let cachedSession: any = null;
 export function Workspace() {
     const path = usePathname();
@@ -30,7 +30,7 @@ export function Workspace() {
     catch (e) {
         setError(message(e));
     } }, []);
-    useEffect(() => { refresh(); const on401 = () => { cachedSession = null; setSession(null); setDenied(true); }; window.addEventListener('hafecs:unauthorized', on401); return () => window.removeEventListener('hafecs:unauthorized', on401); }, [refresh]);
+    useEffect(() => { refresh(); const on401 = () => { cachedSession = null; setSession(null); setDenied(true); }; window.addEventListener('hrp-insight:unauthorized', on401); return () => window.removeEventListener('hrp-insight:unauthorized', on401); }, [refresh]);
     if (denied)
         return <><AuthScreen setup={false} onSuccess={() => refresh(true)}/><Toaster /></>;
     if (error)
@@ -41,7 +41,7 @@ export function Workspace() {
         return <><AuthScreen setup={session.needs_setup} onSuccess={() => refresh(true)}/><Toaster /></>;
     const user: Member = session.user;
     const isAdmin = user.role === 'admin';
-    const active = nav.find(n => n[0] === '/' ? path === '/' : path.startsWith(n[0]));
+    const active = nav.find(n => path.startsWith(n[0]));
     const breadcrumb: Record<string, string> = { '/tim': 'Anggota tim', '/privasi': 'Privasi dan akses', '/audit': 'Jejak aktivitas', '/akun': 'Pengaturan akun', '/bantuan': 'Bantuan & masukan' };
     const route = path.split('/').filter(Boolean);
     let page;
@@ -65,17 +65,17 @@ export function Workspace() {
         page = <AuditPage />;
     else if (route[0] === 'bantuan')
         page = <HelpPage user={user}/>;
-    else if (route.length === 0)
+    else if (route[0] === 'ringkasan' || route.length === 0)
         page = <Dashboard user={user}/>;
     else
-        page = <Blank title="Halaman tidak ditemukan" text=""><Link className="text-link" href="/">Ke ringkasan</Link></Blank>;
-    return <GateProvider><SidebarProvider style={{ '--sidebar-width': '15.5rem' } as React.CSSProperties}><Sidebar className="app-sidebar"><SidebarHeader><Link className="wordmark sidebar-logo" href="/">hafecs<span>insight</span><span className="brand-square"/></Link></SidebarHeader><SidebarContent><SidebarGroup><SidebarGroupLabel>WORKSPACE</SidebarGroupLabel><SidebarMenu>{nav.map(([href, label, Icon]) => <SidebarMenuItem key={href}><SidebarMenuButton asChild isActive={href === '/' ? path === '/' : path.startsWith(href)} tooltip={label}><Link href={href}><Icon /><span>{label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></SidebarGroup><SidebarGroup><SidebarGroupLabel>PENGELOLAAN</SidebarGroupLabel><SidebarMenu>{isAdmin && <>{[['/tim', 'Anggota tim', Users], ['/privasi', 'Privasi dan akses', ShieldCheck], ['/audit', 'Jejak aktivitas', ClipboardList]].map(([href, label, Icon]: any) => <SidebarMenuItem key={href}><SidebarMenuButton asChild isActive={path === href}><Link href={href}><Icon /><span>{label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</>}<SidebarMenuItem><SidebarMenuButton asChild isActive={path === '/bantuan'}><Link href="/bantuan"><LifeBuoy /><span>Bantuan &amp; masukan</span></Link></SidebarMenuButton></SidebarMenuItem><SidebarMenuItem><SidebarMenuButton asChild isActive={path === '/akun'}><Link href="/akun"><Settings2 /><span>Pengaturan akun</span></Link></SidebarMenuButton></SidebarMenuItem></SidebarMenu></SidebarGroup></SidebarContent><SidebarFooter><div className="sidebar-brand"><img src="/images/logo-hrp.jpg" alt="HRP"/></div><div className="user-block"><Link href="/akun" className="avatar">{user.name.slice(0, 1).toUpperCase()}</Link><Link href="/akun" className="user-name">{user.name}<small>{user.role === 'admin' ? 'Administrator' : user.role === 'staff' ? 'Staf kegiatan' : 'Analis'}</small></Link><button title="Keluar" aria-label="Keluar" onClick={async () => { try {
+        page = <Blank title="Halaman tidak ditemukan" text=""><Link className="text-link" href="/ringkasan">Ke ringkasan</Link></Blank>;
+    return <GateProvider><SidebarProvider style={{ '--sidebar-width': '15.5rem' } as React.CSSProperties}><Sidebar className="app-sidebar"><SidebarHeader><Link className="wordmark sidebar-logo" href="/">hrp<span>insight</span><span className="brand-square"/></Link></SidebarHeader><SidebarContent><SidebarGroup><SidebarGroupLabel>WORKSPACE</SidebarGroupLabel><SidebarMenu>{nav.map(([href, label, Icon]) => <SidebarMenuItem key={href}><SidebarMenuButton asChild isActive={path === href || path.startsWith(href + '/')} tooltip={label}><Link href={href}><Icon /><span>{label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></SidebarGroup><SidebarGroup><SidebarGroupLabel>PENGELOLAAN</SidebarGroupLabel><SidebarMenu>{isAdmin && <>{[['/tim', 'Anggota tim', Users], ['/privasi', 'Privasi dan akses', ShieldCheck], ['/audit', 'Jejak aktivitas', ClipboardList]].map(([href, label, Icon]: any) => <SidebarMenuItem key={href}><SidebarMenuButton asChild isActive={path === href}><Link href={href}><Icon /><span>{label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</>}<SidebarMenuItem><SidebarMenuButton asChild isActive={path === '/bantuan'}><Link href="/bantuan"><LifeBuoy /><span>Bantuan &amp; masukan</span></Link></SidebarMenuButton></SidebarMenuItem><SidebarMenuItem><SidebarMenuButton asChild isActive={path === '/akun'}><Link href="/akun"><Settings2 /><span>Pengaturan akun</span></Link></SidebarMenuButton></SidebarMenuItem></SidebarMenu></SidebarGroup></SidebarContent><SidebarFooter><div className="sidebar-brand"><img src="/images/logo-hrp.jpg" alt="HRP"/></div><div className="user-block"><Link href="/akun" className="avatar">{user.name.slice(0, 1).toUpperCase()}</Link><Link href="/akun" className="user-name">{user.name}<small>{user.role === 'admin' ? 'Administrator' : user.role === 'staff' ? 'Staf kegiatan' : 'Analis'}</small></Link><button title="Keluar" aria-label="Keluar" onClick={async () => { try {
         await api('logout', 'POST', {});
     }
     catch (e) {
         toast.error(message(e));
     }
-    cachedSession = null; setSession(null); setDenied(true); }}><LogOut size={17}/></button></div></SidebarFooter></Sidebar><SidebarInset className="workspace-main"><header className="topbar"><div className="breadcrumb"><SidebarTrigger /><span>Workspace</span><ChevronRight size={14}/><span>{active?.[1] ?? breadcrumb[path] ?? 'Pengelolaan'}</span></div><PrivacyBadge /></header><div className="page-content">{page}</div><footer className="workspace-footer"><span>HAFECS Insight</span><span>Research & Publication</span></footer></SidebarInset></SidebarProvider><Toaster position="bottom-right" richColors/></GateProvider>;
+    cachedSession = null; setSession(null); setDenied(true); }}><LogOut size={17}/></button></div></SidebarFooter></Sidebar><SidebarInset className="workspace-main"><header className="topbar"><div className="breadcrumb"><SidebarTrigger /><span>Workspace</span><ChevronRight size={14}/><span>{active?.[1] ?? breadcrumb[path] ?? 'Pengelolaan'}</span></div><PrivacyBadge /></header><div className="page-content">{page}</div><footer className="workspace-footer"><span>HRP Insight</span><span>Research & Publication</span></footer></SidebarInset></SidebarProvider><Toaster position="bottom-right" richColors/></GateProvider>;
 }
 function Dashboard({ user }: {
     user: Member;

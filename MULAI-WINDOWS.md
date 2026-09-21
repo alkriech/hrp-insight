@@ -1,4 +1,4 @@
-# Menjalankan HAFECS Insight di Windows
+# Menjalankan HRP Insight di Windows
 
 Paket ini memiliki setup database dan admin lokal. Gunakan Node.js 22.13 atau lebih baru. Ekstrak ZIP lalu buka CMD pada folder yang berisi package.json. Hentikan server versi lama dengan Ctrl+C terlebih dahulu.
 
@@ -32,7 +32,7 @@ Untuk melihat aplikasi dengan data contoh kegiatan, formulir, respons, template,
 npm run seed:dummy
 ```
 
-Perintah ini menghapus dan menyusun ulang data bisnis lokal (kegiatan, formulir, respons, template, Bantuan & Masukan, audit) lalu mengisi sekitar 15 kegiatan, 29 formulir, dan ribuan respons contoh yang deterministik. Tidak ada akun demo tambahan yang dibuat: akun yang ada (`hafecs-admin`, `hafecs-ira`) tetap berlaku dengan sandi tidak berubah dan akun ber-role staf diberi akses semua kegiatan contoh. Data contoh hanya ditulis ke database lokal; situs online tidak pernah menerima data contoh. Setelah seed, jalankan `npm run dev` seperti biasa.
+Perintah ini menghapus dan menyusun ulang data bisnis lokal (kegiatan, formulir, respons, template, Bantuan & Masukan, audit) lalu mengisi sekitar 15 kegiatan, 29 formulir, dan ribuan respons contoh yang deterministik. Tidak ada akun demo tambahan yang dibuat: akun yang ada (`hrp-admin`, `hrp-ira`) tetap berlaku dengan sandi tidak berubah dan akun ber-role staf diberi akses semua kegiatan contoh. Data contoh hanya ditulis ke database lokal; situs online tidak pernah menerima data contoh. Setelah seed, jalankan `npm run dev` seperti biasa.
 
 Buka http://localhost:5173. Gunakan alamat ini persis, bukan 127.0.0.1, karena validasi Origin harus sesuai. Masuk menggunakan akun yang dibuat di terminal, lalu ganti sandi sementara pada halaman akun. Server hanya mendengarkan localhost. Tutup server dengan Ctrl+C; untuk penggunaan berikutnya cukup npm run dev.
 

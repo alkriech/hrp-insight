@@ -14,7 +14,6 @@ const eslintConfig = defineConfig([
   {
     files: ["components/ui/**/*.{ts,tsx}", "hooks/use-mobile.ts"],
     rules: {
-      // shadcn UI keeps its own rules; the rest of the app runs strict.
       "@typescript-eslint/no-unused-vars": "off",
       "react-hooks/purity": "off",
       "react-hooks/set-state-in-effect": "off",

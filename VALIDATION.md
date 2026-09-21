@@ -1,4 +1,4 @@
-# Catatan validasi HAFECS Insight
+# Catatan validasi HRP Insight
 
 Pengujian dilakukan terhadap kode backend yang sama dengan route produksi, menggunakan adapter SQLite in-memory dengan foreign key aktif dan transaksi untuk emulasi D1 batch. Object storage menggunakan adapter sementara. Seluruh isi pengujian bersifat sintetis dan tidak pernah dimasukkan ke database produksi.
 

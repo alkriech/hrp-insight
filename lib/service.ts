@@ -31,15 +31,15 @@ export function createService(env: AppEnv) {
     const auditStmt = (user: any, action: string, target: string | null = null, detail = '') => stmt('INSERT INTO audit (id,actor_id,actor_name,action,target_id,detail,created_at) VALUES (?,?,?,?,?,?,?)', id(), user?.id ?? null, user?.name ?? 'Peserta', action, target, detail, now());
     const log = async (user: any, action: string, target: string | null = null, detail = '') => auditStmt(user, action, target, detail).run();
     const notifyTelegram = async (category: string, author: string, text: string) => { try { const token = env.TELEGRAM_TOKEN, chatId = env.TELEGRAM_CHAT_ID; if (!token || !chatId)
-        return; const label = category === 'bug' ? 'Laporan error/bug 🐛' : 'Saran pengembangan 💡'; try { const res = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: '🔔 ' + label + '\n\nDari: ' + author + '\n\n' + text.slice(0, 500) }) }); if (!res.ok) console.error('HAFECS Telegram status', res.status, await res.text().catch(() => '')); }
-    catch (e) { console.error('HAFECS Telegram kirim gagal:', e instanceof Error ? e.message : String(e)); } }
+        return; const label = category === 'bug' ? 'Laporan error/bug 🐛' : 'Saran pengembangan 💡'; try { const res = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: '🔔 ' + label + '\n\nDari: ' + author + '\n\n' + text.slice(0, 500) }) }); if (!res.ok) console.error('HRP Insight Telegram status', res.status, await res.text().catch(() => '')); }
+    catch (e) { console.error('HRP Insight Telegram kirim gagal:', e instanceof Error ? e.message : String(e)); } }
     catch { } };
     async function rate(key: string, limit: number, seconds = 600) { const time = Math.floor(Date.now() / 1000); const bucket = Math.floor(time / seconds); const k = await keyedHash(env.DATA_KEY, 'rate:' + key + ':' + bucket); const row = await one('INSERT INTO rate_limits (key,count,expires_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1 RETURNING count', k, time + seconds); if (row.count > limit)
         fail(429, 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.'); }
     async function rateCheck(key: string, limit: number, seconds = 600) { const time = Math.floor(Date.now() / 1000); const bucket = Math.floor(time / seconds); const k = await keyedHash(env.DATA_KEY, 'rate:' + key + ':' + bucket); const row = await one('SELECT count FROM rate_limits WHERE key=?', k); if ((row?.count ?? 0) >= limit)
         fail(429, 'Terlalu banyak percobaan. Tunggu beberapa menit.'); }
     async function rateBump(key: string, seconds = 600) { const time = Math.floor(Date.now() / 1000); const bucket = Math.floor(time / seconds); const k = await keyedHash(env.DATA_KEY, 'rate:' + key + ':' + bucket); await one('INSERT INTO rate_limits (key,count,expires_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1 RETURNING count', k, time + seconds); }
-    async function getSession(request: Request) { const token = request.headers.get('cookie')?.match(/(?:^|;\s*)__Host-hafecs_session=([a-f0-9]{64})(?:;|$)/)?.[1]; if (!token)
+    async function getSession(request: Request) { const token = request.headers.get('cookie')?.match(/(?:^|;\s*)__Host-hrp-insight_session=([a-f0-9]{64})(?:;|$)/)?.[1]; if (!token)
         return null; const hash = await sha256(token); const t = Date.now(); const session = await one('SELECT s.hash,s.reauth_at,s.expires_at,s.last_seen,m.* FROM sessions s JOIN members m ON m.id=s.member_id WHERE s.hash=? AND s.expires_at>? AND s.last_seen>? AND m.active=1', hash, t, t - 60 * 60 * 1000); if (!session)
         return null; if (session.last_seen < t - 60000)
         await run('UPDATE sessions SET last_seen=? WHERE hash=?', t, hash); return session; }
@@ -100,7 +100,7 @@ export function createService(env: AppEnv) {
             requireMutationOrigin(request, env.APP_ORIGIN);
         const body = async () => readJson(request);
         if (parts[0] === 'session' && method === 'GET') {
-            const ws = await one('SELECT * FROM workspace WHERE id=?', 'hafecs');
+            const ws = await one('SELECT * FROM workspace WHERE id=?', 'hrp-insight');
             const u = await getSession(request);
             return json({ needs_setup: !ws, user: u ? safeMember(u) : null, workspace: u ? ws : null });
         }
@@ -109,7 +109,7 @@ export function createService(env: AppEnv) {
                 fail(403, 'Penyiapan awal hanya untuk pemilik situs.');
             if (!request.headers.get('oai-authenticated-user-id'))
                 fail(403, 'Penyiapan awal hanya untuk pemilik situs.');
-            if (await one('SELECT 1 FROM workspace WHERE id=?', 'hafecs'))
+            if (await one('SELECT 1 FROM workspace WHERE id=?', 'hrp-insight'))
                 fail(409, 'Admin sudah dibuat. Masuk.');
             await rate('setup', 5);
             const b = await body();
@@ -123,7 +123,7 @@ export function createService(env: AppEnv) {
             assertPassword(c.password, c.username);
             const name = z.string().trim().min(1).max(100).parse(b.name);
             const mid = id(), time = now();
-            await db.batch([stmt('INSERT INTO members (id,username,password_hash,name,role,created_at) VALUES (?,?,?,?,?,?)', mid, c.username, await hashPassword(c.password), name, 'admin', time), stmt('INSERT INTO workspace (id,name,owner_id,created_at) VALUES (?,?,?,?)', 'hafecs', 'HAFECS Research and Publication', mid, time), auditStmt({ id: mid, name }, 'workspace.setup', 'hafecs')]);
+            await db.batch([stmt('INSERT INTO members (id,username,password_hash,name,role,created_at) VALUES (?,?,?,?,?,?)', mid, c.username, await hashPassword(c.password), name, 'admin', time), stmt('INSERT INTO workspace (id,name,owner_id,created_at) VALUES (?,?,?,?)', 'hrp-insight', 'HRP Insight', mid, time), auditStmt({ id: mid, name }, 'workspace.setup', 'hrp-insight')]);
             return loginResponse({ id: mid });
         }
         if (parts[0] === 'login' && method === 'POST') {
@@ -148,11 +148,16 @@ export function createService(env: AppEnv) {
             await log(u, 'auth.login', u.id);
             return loginResponse(u);
         }
+        if (parts[0] === 'public' && parts[1] === 'landing') {
+            await rate('landing:' + (request.headers.get('cf-connecting-ip') ?? 'unknown'), 200, 60);
+            const ws = await one('SELECT name,landing_request_url,landing_feedback_url FROM workspace WHERE id=?', 'hrp-insight');
+            return json({ name: ws?.name ?? 'HRP Insight', request_url: ws?.landing_request_url ?? '', feedback_url: ws?.landing_feedback_url ?? '' });
+        }
         if (parts[0] === 'public') {
             const fid = parts[1];
             await rate('public:' + (request.headers.get('cf-connecting-ip') ?? 'unknown'), 200, 60);
             const f = await publicForm(request, fid);
-            const ws = await one('SELECT privacy_notice,privacy_contact,retention_days,name FROM workspace WHERE id=?', 'hafecs');
+            const ws = await one('SELECT privacy_notice,privacy_contact,retention_days,name FROM workspace WHERE id=?', 'hrp-insight');
             if (method === 'GET' && parts[2] === 'banner') { const item = f.training_banner ? JSON.parse(f.training_banner) as { key: string; mime: string; size: number } : null; if (!item?.key)
                 fail(404, 'Gambar tidak ditemukan.');
                 const file = await env.BUCKET.get(item.key);
@@ -465,7 +470,7 @@ export function createService(env: AppEnv) {
                 const rows = await rawResponses(f);
                 const qs: Question[] = JSON.parse(f.questions_json).filter((q: Question) => !['section', 'pagebreak'].includes(q.type));
                 await log(u, 'responses.export', fid);
-                return new Response(csv([['ID Respons', 'Waktu Kirim', 'Skor', 'Skor Maksimal', 'Dikecualikan', ...qs.map(q => q.label)], ...rows.map((r: any) => [r.id, r.submitted_at, r.score, r.max_score, r.excluded, ...qs.map(q => Array.isArray(r.answers[q.id]) ? r.answers[q.id].join('; ') : r.answers[q.id])])]), { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="respons-hafecs.csv"' } });
+                return new Response(csv([['ID Respons', 'Waktu Kirim', 'Skor', 'Skor Maksimal', 'Dikecualikan', ...qs.map(q => q.label)], ...rows.map((r: any) => [r.id, r.submitted_at, r.score, r.max_score, r.excluded, ...qs.map(q => Array.isArray(r.answers[q.id]) ? r.answers[q.id].join('; ') : r.answers[q.id])])]), { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="respons-hrp-insight.csv"' } });
             }
             if (parts[2] === 'media' && method === 'POST') {
                 requireEditor(u);
@@ -512,6 +517,20 @@ export function createService(env: AppEnv) {
                 const collection = custom.map((t: any) => ({ ...t, questions: JSON.parse(t.questions_json), questions_json: undefined, builtin: false }));
                 return json({ templates: collection.map((t: any) => u.role === 'analyst' ? { ...t, questions: publicQuestions(t.questions) } : t) });
             }
+            if (method === 'POST' && parts.length === 1) {
+                requireEditor(u);
+                const b = await body();
+                const title = z.string().trim().min(1).max(200).parse(b.title);
+                const type = z.enum(FORM_TYPES.map(x => x[0]) as [
+                    string,
+                    ...string[]
+                ]).parse(b.type);
+                const description = z.string().max(500).parse(b.description ?? '');
+                const questions = cleanQuestions(b.questions ?? []).map((q: Question) => ({ ...q, mediaId: undefined }));
+                const tid = id();
+                await db.batch([stmt('INSERT INTO templates (id,title,type,description,questions_json,created_by,created_at) VALUES (?,?,?,?,?,?,?)', tid, title, type, description, JSON.stringify(questions), u.id, now()), auditStmt(u, 'template.create', tid)]);
+                return json({ id: tid }, 201);
+            }
             if (parts.length === 2 && parts[1] && method === 'PUT') {
                 requireEditor(u);
                 const t = await one('SELECT * FROM templates WHERE id=?', parts[1]);
@@ -555,7 +574,7 @@ export function createService(env: AppEnv) {
             const target = await one('SELECT * FROM members WHERE id=?', mid);
             if (!target)
                 fail(404, 'Akun tidak ditemukan.');
-            const ws = await one('SELECT * FROM workspace WHERE id=?', 'hafecs');
+            const ws = await one('SELECT * FROM workspace WHERE id=?', 'hrp-insight');
             if (mid === ws.owner_id)
                 fail(403, 'Akun pemilik tidak dapat diubah atau dinonaktifkan.');
             if (parts[2] === 'password' && method === 'PUT') {
@@ -661,21 +680,21 @@ export function createService(env: AppEnv) {
         if (parts[0] === 'settings') {
             requireAdmin(u);
             if (method === 'GET') {
-                const ws = await one('SELECT * FROM workspace WHERE id=?', 'hafecs');
+                const ws = await one('SELECT * FROM workspace WHERE id=?', 'hrp-insight');
                 const expired = await one('SELECT COUNT(*) AS count FROM responses WHERE expires_at<=?', now());
                 return json({ settings: ws, expired_count: expired.count });
             }
             requireRecent(u);
             if (method === 'PUT') {
-                const b = z.object({ name: z.string().trim().min(1).max(200), retention_days: z.number().int().min(30).max(3650), privacy_contact: z.string().max(200), privacy_notice: z.string().trim().min(30).max(3000) }).parse(await body());
-                await db.batch([stmt('UPDATE workspace SET name=?,retention_days=?,privacy_contact=?,privacy_notice=? WHERE id=?', b.name, b.retention_days, b.privacy_contact, b.privacy_notice, 'hafecs'), auditStmt(u, 'privacy.update', 'hafecs')]);
+                const b = z.object({ name: z.string().trim().min(1).max(200), retention_days: z.number().int().min(30).max(3650), privacy_contact: z.string().max(200), privacy_notice: z.string().trim().min(30).max(3000), landing_request_url: z.string().max(400).default(''), landing_feedback_url: z.string().max(400).default('') }).parse(await body());
+                await db.batch([stmt('UPDATE workspace SET name=?,retention_days=?,privacy_contact=?,privacy_notice=?,landing_request_url=?,landing_feedback_url=? WHERE id=?', b.name, b.retention_days, b.privacy_contact, b.privacy_notice, b.landing_request_url, b.landing_feedback_url, 'hrp-insight'), auditStmt(u, 'privacy.update', 'hrp-insight')]);
                 return json({ ok: true });
             }
             if (parts[1] === 'purge' && method === 'POST') {
                 const r = await run('DELETE FROM responses WHERE expires_at<=?', now());
                 await run('DELETE FROM sessions WHERE expires_at<=?', Date.now());
                 await run('DELETE FROM rate_limits WHERE expires_at<=?', Math.floor(Date.now() / 1000));
-                await log(u, 'privacy.purge', 'hafecs', String(r.meta.changes) + ' respons kedaluwarsa dihapus');
+                await log(u, 'privacy.purge', 'hrp-insight', String(r.meta.changes) + ' respons kedaluwarsa dihapus');
                 return json({ deleted: r.meta.changes });
             }
         }
@@ -705,7 +724,7 @@ export function createService(env: AppEnv) {
                 }
             }
         } return b; }
-    function jsonCookie(data: unknown, token: string, maxAge = 28800) { const response = json(data); response.headers.set('Set-Cookie', `__Host-hafecs_session=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`); return response; }
+    function jsonCookie(data: unknown, token: string, maxAge = 28800) { const response = json(data); response.headers.set('Set-Cookie', `__Host-hrp-insight_session=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`); return response; }
     async function loginResponse(u: any) { const token = randomToken(), time = Date.now(); await run('INSERT INTO sessions (hash,member_id,created_at,expires_at,last_seen,reauth_at) VALUES (?,?,?,?,?,?)', await sha256(token), u.id, time, time + 8 * 3600000, time, time); await run('DELETE FROM sessions WHERE member_id=? AND hash NOT IN (SELECT hash FROM sessions WHERE member_id=? ORDER BY created_at DESC LIMIT 10)', u.id, u.id); return jsonCookie({ ok: true }, token); }
     async function mediaResponse(mid: string, fid: string) { const m = await one('SELECT * FROM media WHERE id=? AND form_id=?', mid, fid); if (!m)
         fail(404, 'Media tidak ditemukan.'); const file = await env.BUCKET.get(m.key); if (!file)
@@ -744,7 +763,7 @@ export function createService(env: AppEnv) {
             return secureResponse(json({ error: error.message }, error.status));
         if (error instanceof z.ZodError)
             return secureResponse(json({ error: error.issues[0]?.message ?? 'Data tidak valid.' }, 400));
-        console.error('HAFECS request failed', { type: error instanceof Error ? error.name : 'Unknown' });
+        console.error('HRP Insight request failed', { type: error instanceof Error ? error.name : 'Unknown' });
         return secureResponse(json({ error: 'Permintaan belum berhasil. Coba lagi.' }, 503));
     } };
 }

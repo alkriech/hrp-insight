@@ -23,7 +23,7 @@ CREATE TABLE `__new_workspace` (
 	`owner_id` text NOT NULL,
 	`retention_days` integer DEFAULT 365 NOT NULL,
 	`privacy_contact` text DEFAULT '' NOT NULL,
-	`privacy_notice` text DEFAULT 'HAFECS Research and Publication menggunakan data peserta untuk mengevaluasi dan memperbaiki kualitas pelatihan. Identitas peserta hanya dapat diakses oleh petugas yang berwenang.' NOT NULL,
+	`privacy_notice` text DEFAULT 'HRP Insight menggunakan data peserta untuk mengevaluasi dan memperbaiki kualitas pelatihan. Identitas peserta hanya dapat diakses oleh petugas yang berwenang.' NOT NULL,
 	`created_at` text NOT NULL
 );
 --> statement-breakpoint

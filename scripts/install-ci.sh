@@ -49,8 +49,6 @@ if ! flock -n 9; then
   exit 75
 fi
 
-# Catch an installer started outside this helper. Linux exposes both its command
-# line and working directory through /proc, so avoid broad process-name matches.
 for process in /proc/[0-9]*; do
   pid="${process##*/}"
   [[ "${pid}" != "$$" && "${pid}" != "${PPID}" ]] || continue
@@ -65,7 +63,6 @@ done
 
 lockfile_sha256="$(sha256sum "${SITES_PROJECT_ROOT}/package-lock.json" | awk '{print $1}')"
 use_seeded_cache=0
-# Report seed selection separately from package cache hits or downloads.
 cache_seed_result=seed_unavailable
 seed_cache="${SITES_NPM_CACHE_SEED:-}"
 if [[ -n "${seed_cache}" && -d "${seed_cache}" ]]; then
@@ -190,8 +187,6 @@ await writeFile(
     platform: `${process.platform}-${process.arch}`,
   }, null, 2)}\n`,
 );
-// The measured plugin wrapper supplies an existing private file for this attempt.
-// Cache telemetry must not change the install result or create arbitrary files.
 const reportPath = process.env.SITES_INSTALL_REPORT_PATH;
 if (reportPath) {
   let report;
@@ -202,7 +197,6 @@ if (reportPath) {
       await report.writeFile(`${JSON.stringify({ version: 1, cache_seed: process.argv[4] })}\n`);
     }
   } catch {
-    // Leave the decision unavailable rather than inventing seed use or failing setup.
   } finally {
     await report?.close().catch(() => {});
   }

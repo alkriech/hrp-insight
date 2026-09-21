@@ -11,14 +11,14 @@ import { toast } from 'sonner';
 export class ApiError extends Error {
     constructor(public status: number, message: string) { super(message); }
 }
-export async function api(path: string, method = 'GET', body?: unknown, token?: string) { const response = await fetch('/api/' + path, { method, credentials: 'same-origin', cache: 'no-store', headers: { ...(method !== 'GET' ? { 'X-Hafecs-Request': '1' } : {}), ...(body instanceof FormData ? {} : body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body) }); const raw = await response.text(); let data: any; try {
+export async function api(path: string, method = 'GET', body?: unknown, token?: string) { const response = await fetch('/api/' + path, { method, credentials: 'same-origin', cache: 'no-store', headers: { ...(method !== 'GET' ? { 'X-Hrp-Insight-Request': '1' } : {}), ...(body instanceof FormData ? {} : body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body) }); const raw = await response.text(); let data: any; try {
     data = raw ? JSON.parse(raw) : {};
 }
 catch {
     data = {};
 }
 if (response.status === 401)
-    window.dispatchEvent(new CustomEvent('hafecs:unauthorized'));
+    window.dispatchEvent(new CustomEvent('hrp-insight:unauthorized'));
 if (!response.ok)
     throw new ApiError(response.status, data.error ?? (response.status === 413 ? 'File terlalu besar.' : 'Permintaan gagal.')); return data; }
 export const message = (e: unknown) => e instanceof Error ? e.message : 'Terjadi kesalahan. Coba lagi.';

@@ -6,19 +6,27 @@ import path from 'node:path';
 import { getPlatformProxy } from 'wrangler';
 
 export async function migrateLocal(db, root) {
-  await db.prepare('CREATE TABLE IF NOT EXISTS hafecs_local_migrations (name TEXT PRIMARY KEY, digest TEXT NOT NULL)').run();
+  await db.prepare('CREATE TABLE IF NOT EXISTS hrp_insight_local_migrations (name TEXT PRIMARY KEY, digest TEXT NOT NULL)').run();
+  for (const legacyName of ['hafecs_local_migrations', 'hrportal_local_migrations']) {
+    const legacy = await db.prepare('SELECT name FROM sqlite_master WHERE type=? AND name=?').bind('table', legacyName).first();
+    if (legacy) {
+      await db.prepare('INSERT INTO hrp_insight_local_migrations (name,digest) SELECT name,digest FROM ' + legacyName).run();
+      await db.prepare('DROP TABLE ' + legacyName).run();
+    }
+  }
   const journal = JSON.parse(await readFile(path.join(root, 'drizzle/meta/_journal.json'), 'utf8'));
   for (const entry of journal.entries) {
     const sql = await readFile(path.join(root, 'drizzle', entry.tag + '.sql'), 'utf8');
     const digest = createHash('sha256').update(sql).digest('hex');
-    const old = await db.prepare('SELECT digest FROM hafecs_local_migrations WHERE name=?').bind(entry.tag).first();
+    const old = await db.prepare('SELECT digest FROM hrp_insight_local_migrations WHERE name=?').bind(entry.tag).first();
     if (old) {
       if (old.digest !== digest) throw new Error('Migrasi lama berubah. Pulihkan file migrasi asli sebelum melanjutkan.');
       continue;
     }
     const statements = sql.split('--> statement-breakpoint').map(s => s.trim()).filter(Boolean);
-    await db.batch([...statements.map(s => db.prepare(s)), db.prepare('INSERT INTO hafecs_local_migrations VALUES (?,?)').bind(entry.tag, digest)]);
+    await db.batch([...statements.map(s => db.prepare(s)), db.prepare('INSERT INTO hrp_insight_local_migrations VALUES (?,?)').bind(entry.tag, digest)]);
   }
+  await db.prepare("UPDATE workspace SET id='hrp-insight' WHERE id IN ('hafecs','hrportal')").run();
 }
 
 export async function createLocalAdmin(db, name, username) {
@@ -30,8 +38,8 @@ export async function createLocalAdmin(db, name, username) {
   const id = randomUUID(), time = new Date().toISOString();
   await db.batch([
     db.prepare('INSERT INTO members (id,username,password_hash,name,role,must_change_password,created_at) VALUES (?,?,?,?,?,1,?)').bind(id, username, hash, name.trim(), 'admin', time),
-    db.prepare('INSERT INTO workspace (id,name,owner_id,created_at) VALUES (?,?,?,?)').bind('hafecs','HAFECS Research and Publication',id,time),
-    db.prepare('INSERT INTO audit (id,actor_id,actor_name,action,target_id,created_at) VALUES (?,?,?,?,?,?)').bind(randomUUID(),id,name.trim(),'workspace.setup.local','hafecs',time),
+    db.prepare('INSERT INTO workspace (id,name,owner_id,created_at) VALUES (?,?,?,?)').bind('hrp-insight','HRP Insight',id,time),
+    db.prepare('INSERT INTO audit (id,actor_id,actor_name,action,target_id,created_at) VALUES (?,?,?,?,?,?)').bind(randomUUID(),id,name.trim(),'workspace.setup.local','hrp-insight',time),
   ]);
   return password;
 }

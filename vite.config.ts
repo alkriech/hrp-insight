@@ -4,7 +4,7 @@ import hostingConfig from "./.sites/hosting.json";
 import localConfig from "./wrangler.local.json";
 import { sites } from "./build/sites-vite-plugin";
 
-const HAFECS_PLACEHOLDER_DATABASE_ID =
+const HRP_INSIGHT_PLACEHOLDER_DATABASE_ID =
   localConfig.d1_databases[0].database_id;
 
 const { d1, r2 } = hostingConfig;
@@ -17,8 +17,8 @@ const localBindingConfig = {
     ? [
         {
           binding: d1,
-          database_name: "hafecs-d1",
-          database_id: HAFECS_PLACEHOLDER_DATABASE_ID,
+          database_name: "hrp-insight-d1",
+          database_id: HRP_INSIGHT_PLACEHOLDER_DATABASE_ID,
         },
       ]
     : [],
@@ -26,14 +26,13 @@ const localBindingConfig = {
     ? [
         {
           binding: r2,
-          bucket_name: "hafecs-r2",
+          bucket_name: "hrp-insight-r2",
         },
       ]
     : [],
 };
 
 export default defineConfig(async () => {
-  // Wrangler/Miniflare state, registry, and logs stay local under .wrangler/; secrets live in .dev.vars.
   process.env.WRANGLER_WRITE_LOGS ??= "false";
   process.env.WRANGLER_LOG_PATH ??= ".wrangler/logs";
   process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";

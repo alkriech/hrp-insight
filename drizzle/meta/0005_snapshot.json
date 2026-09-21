@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e15dd727-0c3e-42a5-9a7f-bd400404bfa9",
-  "prevId": "7c5ca853-3d1b-41ca-9764-f85ab9d80204",
+  "id": "dec29a35-b9b4-4178-b087-d0f8ec261fd2",
+  "prevId": "e15dd727-0c3e-42a5-9a7f-bd400404bfa9",
   "tables": {
     "audit": {
       "name": "audit",
@@ -1130,6 +1130,22 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'HRP Insight menggunakan data peserta untuk mengevaluasi dan memperbaiki kualitas pelatihan. Identitas peserta hanya dapat diakses oleh petugas yang berwenang.'"
+        },
+        "landing_request_url": {
+          "name": "landing_request_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "landing_feedback_url": {
+          "name": "landing_feedback_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         },
         "created_at": {
           "name": "created_at",

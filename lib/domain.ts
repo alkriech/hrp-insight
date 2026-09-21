@@ -39,6 +39,7 @@ export type FormRecord = {
     expires_at: string | null;
     share_code?: string;
     response_count: number;
+    created_at: string;
     updated_at: string;
 };
 export type Member = {
